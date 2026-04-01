@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Blinkit Sales Analysis Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --yellow: #FFD000;
+    --yellow-light: #FFF3A3;
+    --yellow-dark: #E6B800;
+    --green: #1A7A1A;
+    --green-light: #2ECC2E;
+    --black: #0D0D0D;
+    --dark: #1A1A1A;
+    --card: #242424;
+    --card2: #2E2E2E;
+    --text: #F5F5F5;
+    --muted: #888;
+    --border: rgba(255,208,0,0.15);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--yellow);
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 72px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 30px rgba(255,208,0,0.4);
+  }
+  .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .logo-box {
+    background: var(--yellow);
+    border-radius: 14px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .logo-text {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--black);
+    letter-spacing: -1px;
+  }
+  .logo-text span { color: var(--green); }
+  .header-right {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--black);
+    opacity: 0.6;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* HERO STATS */
+  .hero {
+    padding: 48px 40px 24px;
+    background: linear-gradient(180deg, #1a1a1a 0%, var(--black) 100%);
+  }
+  .hero-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--yellow);
+    margin-bottom: 6px;
+    letter-spacing: -1px;
+  }
+  .hero-sub {
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 300;
+    margin-bottom: 32px;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  .kpi-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 24px 22px;
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp 0.6s ease both;
+  }
+  .kpi-card:nth-child(2) { animation-delay: 0.1s; }
+  .kpi-card:nth-child(3) { animation-delay: 0.2s; }
+  .kpi-card:nth-child(4) { animation-delay: 0.3s; }
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--yellow);
+    border-radius: 18px 18px 0 0;
+  }
+  .kpi-card:nth-child(2)::before { background: var(--green-light); }
+  .kpi-card:nth-child(3)::before { background: #FF6B35; }
+  .kpi-card:nth-child(4)::before { background: #7C5CBF; }
+  .kpi-icon {
+    font-size: 22px;
+    margin-bottom: 12px;
+  }
+  .kpi-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 30px;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -1px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .kpi-label {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* MAIN GRID */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 24px 40px;
+  }
+  .full-width { grid-column: 1 / -1; }
+  .chart-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    animation: fadeUp 0.7s ease both;
+  }
+  .card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+  .card-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+  .badge {
+    background: rgba(255,208,0,0.12);
+    color: var(--yellow);
+    border: 1px solid rgba(255,208,0,0.25);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'Syne', sans-serif;
+  }
+
+  /* BAR CHART */
+  .bar-chart { display: flex; flex-direction: column; gap: 10px; }
+  .bar-row { display: flex; align-items: center; gap: 12px; }
+  .bar-label {
+    font-size: 12px;
+    color: var(--muted);
+    width: 140px;
+    flex-shrink: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .bar-track {
+    flex: 1;
+    height: 32px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--black);
+    font-family: 'Syne', sans-serif;
+    white-space: nowrap;
+    transition: width 1.2s cubic-bezier(0.23,1,0.32,1);
+    width: 0;
+  }
+  .bar-val {
+    font-size: 11px;
+    color: var(--text);
+    width: 60px;
+    text-align: right;
+    flex-shrink: 0;
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+  }
+
+  /* DONUT */
+  .donut-wrap {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+  }
+  .donut-svg { flex-shrink: 0; }
+  .donut-legend { display: flex; flex-direction: column; gap: 10px; }
+  .legend-row { display: flex; align-items: center; gap: 10px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .legend-label { font-size: 12px; color: var(--muted); }
+  .legend-val { font-size: 12px; font-weight: 600; font-family: 'Syne', sans-serif; color: var(--text); margin-left: auto; padding-left: 16px; }
+
+  /* TIMELINE */
+  .timeline-chart { position: relative; height: 160px; margin-top: 10px; }
+  .timeline-bars {
+    display: flex;
+    align-items: flex-end;
+    height: 140px;
+    gap: 8px;
+    padding-bottom: 0;
+  }
+  .t-bar-wrap { display: flex; flex-direction: column; align-items: center; flex: 1; gap: 6px; }
+  .t-bar {
+    width: 100%;
+    border-radius: 6px 6px 0 0;
+    background: var(--yellow);
+    transition: height 1.2s cubic-bezier(0.23,1,0.32,1);
+    min-height: 4px;
+  }
+  .t-label { font-size: 10px; color: var(--muted); }
+  .t-val { font-size: 10px; color: var(--yellow); font-family: 'Syne', sans-serif; font-weight: 700; }
+
+  /* FAT CONTENT */
+  .fat-wrap { display: flex; flex-direction: column; gap: 14px; }
+  .fat-row { display: flex; flex-direction: column; gap: 6px; }
+  .fat-meta { display: flex; justify-content: space-between; }
+  .fat-name { font-size: 13px; font-weight: 500; }
+  .fat-pct { font-size: 13px; font-family: 'Syne', sans-serif; font-weight: 700; }
+  .fat-track { height: 10px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; }
+  .fat-fill { height: 100%; border-radius: 10px; transition: width 1.4s cubic-bezier(0.23,1,0.32,1); width: 0; }
+
+  /* OUTLET CARDS */
+  .outlet-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .outlet-card {
+    background: var(--card2);
+    border-radius: 14px;
+    padding: 18px 16px;
+    border: 1px solid rgba(255,255,255,0.05);
+    text-align: center;
+    transition: transform 0.2s, border-color 0.2s;
+    cursor: default;
+  }
+  .outlet-card:hover { transform: translateY(-4px); border-color: var(--yellow); }
+  .outlet-icon { font-size: 26px; margin-bottom: 10px; }
+  .outlet-name { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .outlet-sales { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; color: var(--yellow); }
+  .outlet-pct { font-size: 11px; color: var(--green-light); margin-top: 4px; }
+
+  /* TIER CHART */
+  .tier-wrap { display: flex; gap: 16px; align-items: stretch; }
+  .tier-block {
+    flex: 1;
+    background: var(--card2);
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .tier-name { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .tier-ring {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    position: relative;
+  }
+  .tier-sales { font-size: 13px; font-weight: 500; color: var(--text); }
+  .tier-items { font-size: 11px; color: var(--muted); }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 30px;
+    color: var(--muted);
+    font-size: 12px;
+    border-top: 1px solid var(--border);
+    margin-top: 10px;
+  }
+  footer span { color: var(--yellow); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--black); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-area">
+    <div class="logo-text">blink<span>it</span></div>
+    <div style="width:1px;height:30px;background:rgba(0,0,0,0.2);"></div>
+    <span style="font-family:'Syne',sans-serif;font-size:14px;font-weight:600;color:#0D0D0D;opacity:0.7;">Sales Analytics</span>
+  </div>
+  <div class="header-right">8,523 Records · FY Analysis</div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-title">Sales & Inventory Dashboard</div>
+  <div class="hero-sub">Comprehensive analysis of Blinkit's product sales, outlet performance, and inventory trends</div>
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-icon">💰</div>
+      <div class="kpi-value">₹12.02L</div>
+      <div class="kpi-label">Total Revenue</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">📦</div>
+      <div class="kpi-value">8,523</div>
+      <div class="kpi-label">Total Records</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">⭐</div>
+      <div class="kpi-value">3.97</div>
+      <div class="kpi-label">Avg Rating</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">🏪</div>
+      <div class="kpi-value">16</div>
+      <div class="kpi-label">Item Categories</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-grid">
+
+  <!-- Sales by Item Type (Horizontal Bar) -->
+  <div class="chart-card" style="grid-column:1/-1;">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Sales by Item Category</div>
+        <div class="card-sub">Total revenue contribution per product type</div>
+      </div>
+      <span class="badge">Top 10</span>
+    </div>
+    <div class="bar-chart" id="itemBars"></div>
+  </div>
+
+  <!-- Outlet Type Sales -->
+  <div class="chart-card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Outlet Type Performance</div>
+        <div class="card-sub">Revenue by store format</div>
+      </div>
+    </div>
+    <div class="outlet-grid" id="outletCards"></div>
+  </div>
+
+  <!-- Fat Content Donut -->
+  <div class="chart-card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Fat Content Distribution</div>
+        <div class="card-sub">Product health profile breakdown</div>
+      </div>
+    </div>
+    <div class="donut-wrap">
+      <svg class="donut-svg" width="160" height="160" viewBox="0 0 160 160" id="donutSvg"></svg>
+      <div class="donut-legend" id="donutLegend"></div>
+    </div>
+  </div>
+
+  <!-- Tier Performance -->
+  <div class="chart-card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Sales by Location Tier</div>
+        <div class="card-sub">Geographic performance breakdown</div>
+      </div>
+    </div>
+    <div class="tier-wrap" id="tierBlocks"></div>
+  </div>
+
+  <!-- Fat Content Bars -->
+  <div class="chart-card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Product Count by Fat Type</div>
+        <div class="card-sub">Inventory health breakdown</div>
+      </div>
+    </div>
+    <div class="fat-wrap" id="fatBars"></div>
+  </div>
+
+  <!-- Establishment Year Timeline -->
+  <div class="chart-card full-width">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Outlet Establishment Timeline</div>
+        <div class="card-sub">Number of outlets opened each year</div>
+      </div>
+      <span class="badge">1998 – 2022</span>
+    </div>
+    <div class="timeline-bars" id="timelineBars"></div>
+  </div>
+
+</div>
+
+<footer>
+  Built with ❤️ for <span>Blinkit Sales Analysis Project</span> · Python · Pandas · Matplotlib · SQLite
+</footer>
+
+<script>
+// ─── DATA ────────────────────────────────────────────────
+const itemSales = [
+  { name: "Fruits & Vegetables", val: 178124 },
+  { name: "Snack Foods",         val: 175434 },
+  { name: "Household",           val: 135977 },
+  { name: "Frozen Foods",        val: 118559 },
+  { name: "Dairy",               val: 101276 },
+  { name: "Canned",              val: 90707 },
+  { name: "Baking Goods",        val: 81895 },
+  { name: "Health & Hygiene",    val: 68026 },
+  { name: "Meat",                val: 59450 },
+  { name: "Soft Drinks",         val: 58514 },
+];
+
+const barColors = [
+  "#FFD000","#FFDA33","#FFE366","#FFEC99","#2ECC2E",
+  "#26A826","#1F841F","#176017","#FF6B35","#FF9066"
+];
+
+const outletData = [
+  { name: "Supermarket Type1", sales: 787550, pct: "65.5%", icon: "🏬" },
+  { name: "Grocery Store",     sales: 151939, pct: "12.6%", icon: "🛒" },
+  { name: "Supermarket Type2", sales: 131478, pct: "10.9%", icon: "🏪" },
+  { name: "Supermarket Type3", sales: 130715, pct: "10.9%", icon: "🏢" },
+];
+
+const fatContent = [
+  { name: "Low Fat", count: 5517, color: "#2ECC2E" },
+  { name: "Regular",  count: 3006, color: "#FFD000" },
+];
+
+const tierData = [
+  { name: "Tier 3", sales: "₹4.72L", items: 3350, color: "#FFD000", ring: "bg" },
+  { name: "Tier 2", sales: "₹3.93L", items: 2785, color: "#2ECC2E", ring: "bg" },
+  { name: "Tier 1", sales: "₹3.36L", items: 2388, color: "#FF6B35", ring: "bg" },
+];
+
+const timeline = [
+  { year: 1998, count: 1463 },
+  { year: 2000, count: 932 },
+  { year: 2010, count: 930 },
+  { year: 2011, count: 555 },
+  { year: 2012, count: 930 },
+  { year: 2015, count: 929 },
+  { year: 2017, count: 930 },
+  { year: 2020, count: 926 },
+  { year: 2022, count: 928 },
+];
+
+// ─── ITEM BARS ────────────────────────────────────────────
+const maxItem = itemSales[0].val;
+const itemBarsEl = document.getElementById('itemBars');
+itemSales.forEach((d, i) => {
+  const pct = (d.val / maxItem * 100).toFixed(1);
+  const row = document.createElement('div');
+  row.className = 'bar-row';
+  row.innerHTML = `
+    <span class="bar-label">${d.name}</span>
+    <div class="bar-track">
+      <div class="bar-fill" data-w="${pct}" style="background:${barColors[i]};width:0%">
+        ₹${(d.val/1000).toFixed(1)}K
+      </div>
+    </div>
+    <span class="bar-val">₹${(d.val/1000).toFixed(0)}K</span>
+  `;
+  itemBarsEl.appendChild(row);
+});
+
+// ─── OUTLET CARDS ─────────────────────────────────────────
+const outletEl = document.getElementById('outletCards');
+outletData.forEach(d => {
+  const card = document.createElement('div');
+  card.className = 'outlet-card';
+  card.innerHTML = `
+    <div class="outlet-icon">${d.icon}</div>
+    <div class="outlet-name">${d.name}</div>
+    <div class="outlet-sales">₹${(d.sales/1000).toFixed(0)}K</div>
+    <div class="outlet-pct">▲ ${d.pct} share</div>
+  `;
+  outletEl.appendChild(card);
+});
+
+// ─── DONUT ────────────────────────────────────────────────
+const totalFat = fatContent.reduce((a,b) => a + b.count, 0);
+const svg = document.getElementById('donutSvg');
+const cx = 80, cy = 80, r = 58, strokeW = 24;
+const circumference = 2 * Math.PI * r;
+let offset = 0;
+const donutColors = ["#2ECC2E","#FFD000"];
+fatContent.forEach((d, i) => {
+  const pct = d.count / totalFat;
+  const dash = circumference * pct;
+  const gap  = circumference - dash;
+  const circle = document.createElementNS("http://www.w3.org/2000/svg","circle");
+  circle.setAttribute("cx", cx);
+  circle.setAttribute("cy", cy);
+  circle.setAttribute("r", r);
+  circle.setAttribute("fill", "none");
+  circle.setAttribute("stroke", donutColors[i]);
+  circle.setAttribute("stroke-width", strokeW);
+  circle.setAttribute("stroke-dasharray", `${dash} ${gap}`);
+  circle.setAttribute("stroke-dashoffset", -offset * circumference + circumference / 4);
+  circle.setAttribute("stroke-linecap", "round");
+  svg.appendChild(circle);
+  offset += pct;
+});
+// Center text
+const text = document.createElementNS("http://www.w3.org/2000/svg","text");
+text.setAttribute("x","80"); text.setAttribute("y","76");
+text.setAttribute("text-anchor","middle");
+text.setAttribute("fill","#F5F5F5");
+text.setAttribute("font-family","Syne");
+text.setAttribute("font-size","22");
+text.setAttribute("font-weight","800");
+text.textContent = "8,523";
+svg.appendChild(text);
+const sub = document.createElementNS("http://www.w3.org/2000/svg","text");
+sub.setAttribute("x","80"); sub.setAttribute("y","94");
+sub.setAttribute("text-anchor","middle");
+sub.setAttribute("fill","#888");
+sub.setAttribute("font-size","10");
+sub.textContent = "products";
+svg.appendChild(sub);
+
+// Legend
+const legendEl = document.getElementById('donutLegend');
+fatContent.forEach((d,i) => {
+  const row = document.createElement('div');
+  row.className = 'legend-row';
+  row.innerHTML = `
+    <div class="legend-dot" style="background:${donutColors[i]}"></div>
+    <span class="legend-label">${d.name}</span>
+    <span class="legend-val">${((d.count/totalFat)*100).toFixed(1)}%</span>
+  `;
+  legendEl.appendChild(row);
+});
+
+// ─── TIER BLOCKS ──────────────────────────────────────────
+const tierEl = document.getElementById('tierBlocks');
+const tierColors = ["#FFD000","#2ECC2E","#FF6B35"];
+tierData.forEach((d,i) => {
+  const block = document.createElement('div');
+  block.className = 'tier-block';
+  block.innerHTML = `
+    <div class="tier-name">${d.name}</div>
+    <div class="tier-ring" style="background:${tierColors[i]}22;border:3px solid ${tierColors[i]};color:${tierColors[i]}">
+      ${d.sales}
+    </div>
+    <div class="tier-sales">${d.items.toLocaleString()} items</div>
+    <div class="tier-items">location records</div>
+  `;
+  tierEl.appendChild(block);
+});
+
+// ─── FAT BARS ─────────────────────────────────────────────
+const fatEl = document.getElementById('fatBars');
+const fatMax = Math.max(...fatContent.map(d => d.count));
+const fatColors2 = ["#2ECC2E","#FFD000"];
+fatContent.forEach((d,i) => {
+  const pct = (d.count / fatMax * 100).toFixed(1);
+  const row = document.createElement('div');
+  row.className = 'fat-row';
+  row.innerHTML = `
+    <div class="fat-meta">
+      <span class="fat-name">${d.name}</span>
+      <span class="fat-pct" style="color:${fatColors2[i]}">${d.count.toLocaleString()} items</span>
+    </div>
+    <div class="fat-track">
+      <div class="fat-fill" data-w="${pct}" style="background:${fatColors2[i]};width:0%"></div>
+    </div>
+  `;
+  fatEl.appendChild(row);
+});
+
+// ─── TIMELINE ─────────────────────────────────────────────
+const tlEl = document.getElementById('timelineBars');
+const tlMax = Math.max(...timeline.map(d => d.count));
+timeline.forEach((d,i) => {
+  const heightPct = (d.count / tlMax * 120).toFixed(0);
+  const wrap = document.createElement('div');
+  wrap.className = 't-bar-wrap';
+  wrap.innerHTML = `
+    <div class="t-val">${d.count}</div>
+    <div class="t-bar" data-h="${heightPct}" style="height:0px;background:${i===0?'#FFD000':'rgba(255,208,0,0.55)'}"></div>
+    <div class="t-label">${d.year}</div>
+  `;
+  tlEl.appendChild(wrap);
+});
+
+// ─── ANIMATE ON LOAD ──────────────────────────────────────
+function animateAll() {
+  // Bar fills
+  document.querySelectorAll('.bar-fill[data-w]').forEach(el => {
+    el.style.width = el.dataset.w + '%';
+  });
+  // Fat fills
+  document.querySelectorAll('.fat-fill[data-w]').forEach(el => {
+    el.style.width = el.dataset.w + '%';
+  });
+  // Timeline bars
+  document.querySelectorAll('.t-bar[data-h]').forEach(el => {
+    el.style.height = el.dataset.h + 'px';
+  });
+}
+
+window.addEventListener('load', () => {
+  setTimeout(animateAll, 300);
+});
+</script>
+</body>
+</html>
