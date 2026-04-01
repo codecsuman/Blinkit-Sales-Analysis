@@ -98,3 +98,55 @@ Blinkit-Sales-Analysis/
 ├── 🌐 blinkit_dashboard.html  # Interactive Web Dashboard
 ├── 🖼️ blinkit_logo.png       # Assets
 └── 📄 README.md              # Documentation
+
+
+---
+
+## 🚀 Getting Started
+
+### 1️⃣ Clone Repository
+```bash
+git clone https://github.com/codecsuman/Blinkit-Sales-Analysis.git
+cd Blinkit-Sales-Analysis
+
+2️⃣ Install Libraries
+
+pip install pandas matplotlib seaborn jupyter
+
+3️⃣ Run Notebook
+
+jupyter notebook index.ipynb
+
+4️⃣ Open Dashboard
+
+Open this file in browser:
+
+blinkit_dashboard.html
+
+🔍 Workflow
+
+📥 Data Collection
+🧹 Data Cleaning
+⚙️ Processing & Aggregation
+📈 Visualization
+💡 Insights Generation
+
+🖥️ Dashboard Features
+📊 KPI Cards
+📉 Interactive Charts
+🍩 Donut Visualization
+📍 Tier-based Insights
+🎨 Modern UI
+📱 Responsive Layout
+👤 Author
+
+Suman
+🔗 https://github.com/codecsuman
+
+<div align="center">
+
+⭐ If you like this project, give it a star!
+
+Made with ❤️ using Python & Data Analytics
+
+</div> ```
